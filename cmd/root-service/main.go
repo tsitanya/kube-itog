@@ -1,16 +1,35 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
+var (
+	appName  string
+	bindPort string
+)
+
+func init() {
+	var ok bool
+
+	if appName, ok = os.LookupEnv("API_APP_NAME"); !ok {
+		appName = "API"
+	}
+
+	if bindPort, ok = os.LookupEnv("API_BIND_PORT"); !ok {
+		bindPort = "8080"
+	}
+}
+
 func main() {
-	log.Println("Start Root Service")
+	log.Printf("Start %s Service on port :%s\n", appName, bindPort)
 
 	http.HandleFunc("/", rootHandler())
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", bindPort), nil); err != nil {
 		log.Fatalln(err)
 	}
 }
