@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-app
+  labels:
+    app.kubernetes.io/part-of: kube-itog-tsitanya
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: api-app
+  template:
+    metadata:
+      labels:
+        app: api-app
+        app.kubernetes.io/part-of: kube-itog-tsitanya
+    spec:
+      containers:
+        - name: api-app
+          image: docker.io/REPO_OWNER/api-service:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: api-config

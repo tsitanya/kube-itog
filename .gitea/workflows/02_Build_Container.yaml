@@ -1,0 +1,61 @@
+name: 02_Build_Container
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    env:
+      TSITANYA_WORKSPACE: kube-itog-tsitanya
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push root-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cmd/root-service/Dockerfile
+          push: true
+          tags: |
+            docker.io/${{ vars.REPO_OWNER }}/root-service:${{ gitea.ref_name }}
+            docker.io/${{ vars.REPO_OWNER }}/root-service:latest
+
+      - name: Build and push api-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cmd/api-service/Dockerfile
+          push: true
+          tags: |
+            docker.io/${{ vars.REPO_OWNER }}/api-service:${{ gitea.ref_name }}
+            docker.io/${{ vars.REPO_OWNER }}/api-service:latest
+
+      - name: Build and push info-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cmd/info-service/Dockerfile
+          push: true
+          tags: |
+            docker.io/${{ vars.REPO_OWNER }}/info-service:${{ gitea.ref_name }}
+            docker.io/${{ vars.REPO_OWNER }}/info-service:latest
+
+      - name: Build and push login-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cmd/login-service/Dockerfile
+          push: true
+          tags: |
+            docker.io/${{ vars.REPO_OWNER }}/login-service:${{ gitea.ref_name }}
+            docker.io/${{ vars.REPO_OWNER }}/login-service:latest

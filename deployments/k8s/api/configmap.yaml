@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  labels:
+    app.kubernetes.io/part-of: kube-itog-tsitanya
+data:
+  API_APP_NAME: "API"
+  API_BIND_PORT: "8080"

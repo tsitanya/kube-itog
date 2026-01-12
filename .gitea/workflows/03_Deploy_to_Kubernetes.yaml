@@ -1,0 +1,32 @@
+name: 03_Deploy_to_Kubernetes
+
+on:
+  release:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      TSITANYA_WORKSPACE: kube-itog-tsitanya
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          printf '%s' "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy manifests
+        env:
+          REPO_OWNER: ${{ vars.REPO_OWNER }}
+        run: |
+          find deployments/k8s -type f -name 'deployment.yaml' -print0 | xargs -0 sed -i "s/REPO_OWNER/${REPO_OWNER}/g"
+          kubectl apply -f deployments/k8s/root
+          kubectl apply -f deployments/k8s/api
+          kubectl apply -f deployments/k8s/info
+          kubectl apply -f deployments/k8s/login
+          kubectl apply -f deployments/k8s/ingress.yaml
